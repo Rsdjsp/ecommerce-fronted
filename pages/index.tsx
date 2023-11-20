@@ -1,15 +1,19 @@
 import Head from "next/head";
-
-import { Inter } from "next/font/google";
-
 import Container from "@/components/Container";
-
 import Carousel from "@/components/Carousel";
-import Footer from "@/components/Footer";
-
-const inter = Inter({ subsets: ["latin"] });
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useEffect } from "react";
+import { fetchProducts, selectProducts } from "@/redux/slices/product-slice";
+import { Flex, Spinner } from "@chakra-ui/react";
 
 export default function Home() {
+  const dispatch = useAppDispatch();
+  const { loading } = useAppSelector(selectProducts);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
+
   return (
     <>
       <Head>
@@ -19,9 +23,21 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <Container />
-        <Carousel />
-        <Footer/>
+        {loading ? (
+          <Flex
+            minW="100vw"
+            minH="100vh"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Spinner color="brand.500" size="xl" />
+          </Flex>
+        ) : (
+          <>
+            <Container />
+            <Carousel />
+          </>
+        )}
       </main>
     </>
   );

@@ -1,3 +1,4 @@
+import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
 
 import { Flex } from "@chakra-ui/react";
@@ -13,6 +14,7 @@ function Default({ children }: Props) {
       <Flex h="100%" marginTop={20} >
         {children}
       </Flex>
+      <Footer />
     </Flex>
   );
 }

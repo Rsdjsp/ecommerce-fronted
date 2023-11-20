@@ -11,24 +11,32 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuDivider,
   useDisclosure,
   useColorModeValue,
   Stack,
+  Icon,
 } from "@chakra-ui/react";
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import SearchBar from "./SearchBar";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { IoIosCart } from "react-icons/io";
+import { useAppSelector } from "@/redux/hooks";
+import { getUser } from "@/redux/slices/user-slice";
 
-interface Props {
-  children: React.ReactNode;
+interface NavLinkProps {
+  label: string;
+  url: string;
 }
 
-const Links = ["All", "Hot Sales", "Collection"];
+const Links = [
+  { label: "All", url: "/products/all" },
+  { label: "Hot Sales", url: "/products/hot-sales" },
+  { label: "Collection", url: "/products/collection" },
+];
 
-const NavLink = (props: Props) => {
-  const { children } = props;
+const NavLink = (props: NavLinkProps) => {
+  const { label, url } = props;
 
   return (
     <Box
@@ -40,18 +48,18 @@ const NavLink = (props: Props) => {
         textDecoration: "none",
         bg: useColorModeValue("gray.200", "gray.700"),
       }}
-      href={"#"}
+      href={url}
     >
-      {children}
+      {label}
     </Box>
   );
 };
 
-export default function Simple() {
+export default function NavBar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const router = useRouter();
+  const {user}= useAppSelector(getUser);
 
-  console.log(router.pathname);
+  const router = useRouter();
 
   return (
     <>
@@ -82,12 +90,17 @@ export default function Simple() {
               display={{ base: "none", md: "flex" }}
             >
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link.label} label={link.label} url={link.url} />
               ))}
             </HStack>
           </HStack>
           {router.pathname !== "/" && <SearchBar />}
           <Flex alignItems={"center"}>
+            <Link href="/checkout/cart">
+              <Button mr="20px">
+                <Icon as={IoIosCart} />
+              </Button>
+            </Link>
             <Menu>
               <MenuButton
                 as={Button}
@@ -98,24 +111,29 @@ export default function Simple() {
               >
                 <Avatar
                   size={"sm"}
-                  name="Robert Santos"
+                  name={user.name}
                   border="1px solid white"
                 />
               </MenuButton>
               <MenuList>
-                <MenuItem>Cart</MenuItem>
-                <MenuDivider />
-                <MenuItem>Log out</MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    localStorage.clear();
+                    router.replace("/auth/login");
+                  }}
+                >
+                  Log out
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
         </Flex>
 
         {isOpen ? (
-          <Box pb={4} display={{ md: "none" }}>
+          <Box pb={4} display={{ md: "none" }} bg="gray.100">
             <Stack as={"nav"} spacing={4}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link.label} label={link.label} url={link.url} />
               ))}
             </Stack>
           </Box>
